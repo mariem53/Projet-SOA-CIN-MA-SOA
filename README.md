@@ -46,6 +46,7 @@ Le frontend utilise uniquement les **services REST** fournis par le backend et s
 * Messages visuels (succès / erreur)
 * Interface **responsive** grâce à Bootstrap
 ![image](img/interface.jpeg)
+![image](img/interface2.jpg)
 
 ---
 
@@ -66,9 +67,9 @@ Le frontend utilise uniquement les **services REST** fournis par le backend et s
 * **JDBC / JPA (Hibernate)**
 * **Apache Tomcat**
 * **API REST (JSON)**
-
 ---
-![image](img/interface2.jpeg)
+![image](img/structure.jpeg)
+
 
 
 ## Architecture du projet
@@ -99,6 +100,7 @@ Base de données
 | Recherche par ID       | GET     | `/api/users/getid/{id}`               |
 | Recherche par nom      | GET     | `/api/users/getname/{name}`           |
 
+
 ---
 
 ## Instructions d’exécution (Étape par étape)
@@ -110,7 +112,7 @@ Base de données
 3. Vérifier l’accessibilité de l’API via :
 
    ```
-   http://localhost:8080/TestRS/api/users
+   http://localhost:8081/TestRS/api/users
    ```
 
 ---

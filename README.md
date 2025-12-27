@@ -7,7 +7,7 @@ Le projet repose sur une architecture **Client / Serveur REST** où :
 
 - Le **frontend** fournit une interface utilisateur moderne, interactive et responsive.
 - Le **backend** expose des services RESTful développés en **JEE / JAX-RS**, avec **JPA / Hibernate** pour la persistance des données.
-
+![image](img/image.jpg)
 Ce projet a été réalisé dans le cadre du **cours de développement JEE**, afin de démontrer l’intégration complète d’une architecture REST avec une interface web dynamique.
 
 ---

@@ -45,6 +45,7 @@ Le frontend utilise uniquement les **services REST** fournis par le backend et s
 * Formulaires avec validation des champs
 * Messages visuels (succès / erreur)
 * Interface **responsive** grâce à Bootstrap
+![image](img/interface.jpeg)
 
 ---
 
@@ -67,6 +68,8 @@ Le frontend utilise uniquement les **services REST** fournis par le backend et s
 * **API REST (JSON)**
 
 ---
+![image](img/interface2.jpeg)
+
 
 ## Architecture du projet
 

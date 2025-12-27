@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINÉMA SOA - Gestion des Visiteurs</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js pour les statistiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-gold: #FFD700;
+            --secondary-red: #B22222;
+            --dark-bg: #0A0A0A;
+            --light-bg: #1A1A1A;
+            --text-light: #F8F9FA;
+            --text-dark: #212529;
+            --accent-blue: #1E90FF;
+            --accent-purple: #8A2BE2;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-light);
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.92)),
+                url('WhatsApp Image 2025-12-23 at 01.25.16.jpeg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(
+                    circle at 20% 30%,
+                    rgba(178, 34, 34, 0.15) 0%,
+                    transparent 40%
+                ),
+                radial-gradient(
+                    circle at 80% 70%,
+                    rgba(255, 215, 0, 0.1) 0%,
+                    transparent 40%
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            max-width: 1400px;
+        }
+        
+        /* Header Styles */
+        .cinema-header {
+            background: linear-gradient(135deg, 
+                rgba(178, 34, 34, 0.85), 
+                rgba(139, 0, 0, 0.75),
+                rgba(178, 34, 34, 0.85));
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 40px;
+            border: 4px solid var(--primary-gold);
+            box-shadow: 
+                0 20px 60px rgba(178, 34, 34, 0.4),
+                0 0 0 1px rgba(255, 215, 0, 0.3),
+                inset 0 0 40px rgba(255, 215, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .cinema-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, transparent 30%, rgba(255, 215, 0, 0.1) 50%, transparent 70%);
+            animation: shine 8s infinite linear;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--primary-gold);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+            text-shadow: 
+                3px 3px 0 rgba(178, 34, 34, 0.5),
+                6px 6px 20px rgba(0, 0, 0, 0.8),
+                0 0 30px rgba(255, 215, 0, 0.5);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .main-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary-gold), transparent);
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.95);
+            letter-spacing: 2px;
+            font-weight: 300;
+            text-transform: uppercase;
+            margin-top: 20px;
+        }
+        
+        /* Cards */
+        .cinema-card {
+            background: linear-gradient(145deg, 
+                rgba(26, 26, 26, 0.85), 
+                rgba(20, 20, 20, 0.9));
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 
+                0 15px 50px rgba(0, 0, 0, 0.6),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cinema-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--secondary-red), 
+                var(--primary-gold), 
+                var(--accent-blue));
+        }
+        
+        .cinema-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary-gold);
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.8),
+                0 0 0 2px rgba(255, 215, 0, 0.4),
+                inset 0 0 40px rgba(255, 215, 0, 0.05);
+        }
+        
+        .card-title {
+            font-family: 'Cinzel', serif;
+            color: var(--primary-gold);
+            font-size: 2rem;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+        
+        .card-title i {
+            background: linear-gradient(135deg, var(--secondary-red), var(--primary-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.8rem;
+        }
+        
+        /* Buttons */
+        .btn-cinema {
+            background: linear-gradient(135deg, var(--secondary-red), #8B0000, var(--secondary-red));
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 
+                0 6px 20px rgba(178, 34, 34, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-cinema::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .btn-cinema:hover::before {
+            left: 100%;
+        }
+        
+        .btn-cinema:hover {
+            background-position: 100% 100%;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 10px 30px rgba(178, 34, 34, 0.6),
+                0 0 0 1px rgba(255, 215, 0, 0.3);
+            color: var(--primary-gold);
+        }
+        
+        .btn-secondary-cinema {
+            background: linear-gradient(135deg, rgba(51, 51, 51, 0.8), rgba(85, 85, 85, 0.8));
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-secondary-cinema:hover {
+            background: linear-gradient(135deg, rgba(70, 70, 70, 0.9), rgba(100, 100, 100, 0.9));
+            color: var(--primary-gold);
+            border-color: var(--primary-gold);
+            transform: translateY(-2px);
+        }
+        
+        /* Form Controls */
+        .form-control-cinema {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 14px 18px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .form-control-cinema:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-gold);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.25);
+        }
+        
+        .form-control-cinema::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Table Styles */
+        .table-cinema {
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.7), rgba(20, 20, 20, 0.8));
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .table-cinema thead {
+            background: linear-gradient(135deg, var(--secondary-red), #8B0000, var(--secondary-red));
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .table-cinema th {
+            color: var(--primary-gold);
+            font-weight: 700;
+            padding: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border: none;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            border-bottom: 3px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .table-cinema tbody tr {
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .table-cinema tbody tr:hover {
+            background: linear-gradient(90deg, 
+                rgba(255, 215, 0, 0.1), 
+                rgba(178, 34, 34, 0.1),
+                rgba(255, 215, 0, 0.1));
+            transform: scale(1.01);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .table-cinema td {
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.95);
+            border: none;
+            vertical-align: middle;
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+        
+        /* Badges */
+        .badge-cinema {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid transparent;
+        }
+        
+        .badge-gold {
+            background: linear-gradient(135deg, var(--primary-gold), #FFC107);
+            color: var(--text-dark);
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+        
+        .badge-red {
+            background: linear-gradient(135deg, var(--secondary-red), #DC3545);
+            color: white;
+            border-color: rgba(220, 53, 69, 0.3);
+        }
+        
+        .badge-blue {
+            background: linear-gradient(135deg, var(--accent-blue), #0B5ED7);
+            color: white;
+            border-color: rgba(13, 110, 253, 0.3);
+        }
+        
+        .badge-purple {
+            background: linear-gradient(135deg, var(--accent-purple), #6F42C1);
+            color: white;
+            border-color: rgba(111, 66, 193, 0.3);
+        }
+        
+        /* Statistics Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.75), rgba(20, 20, 20, 0.85));
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary-red), var(--primary-gold));
+        }
+        
+        .stat-card:hover {
+            border-color: var(--primary-gold);
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.2);
+        }
+        
+        .stat-icon {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary-gold), var(--secondary-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+        
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-gold), #FFC107, var(--primary-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 15px 0;
+            font-family: 'Cinzel', serif;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.75), rgba(20, 20, 20, 0.85));
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Loading Spinner */
+        .loader {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 215, 0, 0.1);
+            border-top: 5px solid var(--primary-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modal Styles */
+        .modal-cinema .modal-content {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(20, 20, 20, 0.95));
+            border: 3px solid var(--primary-gold);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+        }
+        
+        .modal-cinema .modal-header {
+            border-bottom: 2px solid rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, var(--secondary-red), #8B0000);
+            border-radius: 20px 20px 0 0;
+            padding: 25px 30px;
+        }
+        
+        .modal-cinema .modal-title {
+            color: var(--primary-gold);
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .btn-close-cinema {
+            filter: invert(1) sepia(1) saturate(5) hue-rotate(0deg);
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-close-cinema:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+        
+        /* Search Box */
+        .search-box {
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.75), rgba(20, 20, 20, 0.85));
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50px;
+            padding: 5px 5px 5px 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .search-box:focus-within {
+            border-color: var(--primary-gold);
+            box-shadow: 
+                0 0 0 4px rgba(255, 215, 0, 0.2),
+                0 12px 40px rgba(255, 215, 0, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .search-input {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1.1rem;
+            outline: none;
+            flex: 1;
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+        }
+        
+        .search-button {
+            background: linear-gradient(135deg, var(--secondary-red), #8B0000, var(--secondary-red));
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 
+                0 4px 15px rgba(178, 34, 34, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            min-width: fit-content;
+            height: 45px;
+        }
+        
+        .search-button:hover {
+            background-position: 100% 100%;
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px rgba(178, 34, 34, 0.6),
+                0 0 0 1px rgba(255, 215, 0, 0.3);
+            color: var(--primary-gold);
+        }
+        
+        /* Footer */
+        .cinema-footer {
+            margin-top: 50px;
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(20, 20, 20, 0.9));
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border-top: 4px solid var(--primary-gold);
+            box-shadow: 0 -10px 40px rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+        
+        .cinema-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                var(--primary-gold), 
+                var(--secondary-red), 
+                var(--primary-gold), 
+                transparent);
+        }
+        
+        /* Action buttons in table */
+        .btn-sm.btn-cinema {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+        
+        .btn-sm.btn-danger {
+            background: linear-gradient(135deg, #DC3545, var(--secondary-red));
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-sm.btn-danger:hover {
+            background: linear-gradient(135deg, #BB2D3B, #8B0000);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+        
+        /* Responsive adjustments for action buttons */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+                letter-spacing: 2px;
+            }
+            
+            .title-section {
+                margin-bottom: 25px;
+            }
+            
+            .cinema-header {
+                padding: 25px 20px;
+                margin-bottom: 25px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .stat-value {
+                font-size: 2.5rem;
+            }
+            
+            .table-cinema th,
+            .table-cinema td {
+                padding: 15px;
+                font-size: 0.95rem;
+            }
+            
+            .d-flex.gap-2 {
+                flex-direction: column;
+                gap: 5px !important;
+            }
+            
+            .btn-sm.btn-cinema,
+            .btn-sm.btn-danger {
+                width: 100%;
+                padding: 10px;
+            }
+            
+            .search-box {
+                flex-direction: column;
+                border-radius: 25px;
+            }
+            
+            .search-button {
+                width: 100%;
+                justify-content: center;
+                padding: 10px 20px;
+                margin-top: 10px;
+            }
+        }
+        
+        /* Movie Reel Animation */
+        .movie-reel {
+            display: inline-block;
+            animation: rotateReel 20s linear infinite;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+        }
+        
+        @keyframes rotateReel {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Floating Effect */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-15px) rotate(2deg); }
+            66% { transform: translateY(5px) rotate(-2deg); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Glowing Text */
+        .glow-text {
+            text-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.8),
+                0 0 40px rgba(255, 215, 0, 0.5),
+                0 0 60px rgba(255, 215, 0, 0.3);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--secondary-red), var(--primary-gold));
+            border-radius: 10px;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--primary-gold), var(--secondary-red));
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* Visitor Row Actions */
+        .visitor-row {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .visitor-row:hover::after {
+            content: '🎬';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(178, 34, 34, 0.1));
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Counter Animation */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .counter-animation {
+            animation: countUp 0.5s ease-out;
+        }
+        
+        /* Background Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            animation: particleFloat 20s infinite linear;
+        }
+        
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+        }
+        
+        /* Image overlay for better readability */
+        .content-overlay {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Notification styles */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        /* Modal backdrop fix */
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+        /* Improved Select Styling */
+select.form-control-cinema {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: rgba(255, 255, 255, 0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23FFD700' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 18px center;
+    background-size: 16px;
+    padding-right: 50px;
+    cursor: pointer;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+select.form-control-cinema:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-gold);
+    color: white;
+    box-shadow: 
+        0 0 0 4px rgba(255, 215, 0, 0.25),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    outline: none;
+}
+
+select.form-control-cinema:hover {
+    border-color: rgba(255, 215, 0, 0.5);
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+select.form-control-cinema option {
+    background-color: rgba(26, 26, 26, 0.95);
+    color: white;
+    padding: 12px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+select.form-control-cinema option:hover,
+select.form-control-cinema option:focus,
+select.form-control-cinema option:checked {
+    background: linear-gradient(135deg, var(--secondary-red), #8B0000);
+    color: var(--primary-gold);
+}
+
+/* For Firefox */
+select.form-control-cinema::-moz-focus-inner {
+    border: 0;
+}
+
+select.form-control-cinema:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 white;
+}
+
+/* Custom dropdown arrow for IE */
+select.form-control-cinema::-ms-expand {
+    display: none;
+}
+
+/* Style for disabled options */
+select.form-control-cinema option:disabled {
+    color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(26, 26, 26, 0.8);
+}
+
+/* Style for optgroups */
+select.form-control-cinema optgroup {
+    background-color: rgba(20, 20, 20, 0.95);
+    color: var(--primary-gold);
+    font-weight: 600;
+    font-family: 'Cinzel', serif;
+}
+
+select.form-control-cinema optgroup option {
+    padding-left: 30px;
+    background-color: rgba(30, 30, 30, 0.95);
+}
+
+/* Animation for select focus */
+@keyframes selectPulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+
+select.form-control-cinema:focus {
+    animation: selectPulse 1.5s infinite;
+}
+
+/* Responsive adjustments for select */
+@media (max-width: 768px) {
+    select.form-control-cinema {
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        background-position: right 15px center;
+    }
+}
+
+/* Gold gradient border effect for selected option */
+select.form-control-cinema:focus option:checked {
+    background: linear-gradient(135deg, var(--secondary-red), var(--primary-gold));
+    color: white;
+    font-weight: 600;
+}
+    </style>
+</head>
+<body>
+    <!-- Background Particles -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="container content-overlay">
+        <!-- Header -->
+        <div class="cinema-header floating">
+            <div class="title-section">
+                <h1 class="main-title glow-text">
+                    <i class="fas fa-film movie-reel"></i>
+                    CINÉMA SOA
+                    <i class="fas fa-film movie-reel"></i>
+                </h1>
+                <p class="subtitle">GESTION DE LA LISTE D'ATTENTE DES VISITEURS</p>
+            </div>
+            
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center mb-3 mb-md-0">
+                    <div class="stat-value counter-animation" id="live-counter">0</div>
+                    <p class="stat-label">Visiteurs en attente</p>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Visitors List -->
+            <div class="col-lg-8">
+                <div class="cinema-card">
+                    <h2 class="card-title">
+                        <i class="fas fa-users"></i> Liste des Visiteurs
+                    </h2>
+                    
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="search-input" 
+                               placeholder="Rechercher par nom, âge ou ID..." 
+                               onkeyup="filterVisitors()">
+                        <button class="search-button" onclick="clearSearch()">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                    </div>
+                    
+                    <!-- Loading -->
+                    <div id="loading-spinner" class="text-center">
+                        <div class="loader"></div>
+                        <p class="mt-3">Chargement des visiteurs...</p>
+                    </div>
+                    
+                    <!-- Visitors Table -->
+                    <div id="visitors-container" style="display: none;">
+                        <div class="table-responsive">
+                            <table class="table table-cinema">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nom</th>
+                                        <th>Âge</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="visitors-tbody">
+                                    <!-- Visitors loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="empty-state" class="text-center py-5" style="display: none;">
+                        <div class="mb-4">
+                            <i class="fas fa-user-slash fa-5x" style="
+                                background: linear-gradient(135deg, var(--primary-gold), var(--secondary-red));
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                            "></i>
+                        </div>
+                        <h4 class="mb-3" style="color: var(--primary-gold);">Aucun visiteur enregistré</h4>
+                        <p class="mb-4" style="color: rgba(255,255,255,0.8);">La liste d'attente est vide. Ajoutez le premier visiteur !</p>
+                        <button class="btn btn-cinema" data-bs-toggle="modal" data-bs-target="#addModal">
+                            <i class="fas fa-user-plus me-2"></i>Ajouter un visiteur
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions & Info -->
+            <div class="col-lg-4">
+                <div class="cinema-card">
+                    <h2 class="card-title">
+                        <i class="fas fa-bolt"></i> Actions Rapides
+                    </h2>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-cinema mb-3" data-bs-toggle="modal" data-bs-target="#addModal">
+                            <i class="fas fa-user-plus"></i> Nouveau Visiteur
+                        </button>
+                        <button class="btn btn-secondary-cinema" onclick="loadVisitors()">
+                            <i class="fas fa-sync-alt"></i> Actualiser la liste
+                        </button>
+                        <button class="btn btn-secondary-cinema" data-bs-toggle="modal" data-bs-target="#searchModal">
+                            <i class="fas fa-search"></i> Recherche avancée
+                        </button>
+                        <button class="btn btn-secondary-cinema" onclick="exportData()">
+                            <i class="fas fa-file-export"></i> Exporter les données
+                        </button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="cinema-card mt-4">
+            <h2 class="card-title">
+                <i class="fas fa-chart-bar"></i> Statistiques Détaillées
+            </h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value counter-animation" id="stat-total">0</div>
+                    <div class="stat-label">Visiteurs Totaux</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-child"></i>
+                    </div>
+                    <div class="stat-value counter-animation" id="stat-young">0</div>
+                    <div class="stat-label">Jeunes (< 18 ans)</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="stat-value counter-animation" id="stat-adult">0</div>
+                    <div class="stat-label">Adultes (18-60)</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <div class="stat-value counter-animation" id="stat-senior">0</div>
+                    <div class="stat-label">Séniors (> 60 ans)</div>
+                </div>
+            </div>
+            
+            <!-- Charts -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="cinema-footer">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-start">
+                    <p class="mb-0" style="color: rgba(255,255,255,0.9);">
+                        <i class="fas fa-film me-2" style="color: var(--primary-gold);"></i>
+                        Système de Gestion Cinéma SOA
+                    </p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-0">
+                        <span class="badge badge-gold me-2" style="font-size: 0.9rem; padding: 8px 16px;">
+                            <i class="fas fa-database me-1"></i> JPA/Hibernate
+                        </span>
+                        <span class="badge badge-red" style="font-size: 0.9rem; padding: 8px 16px;">
+                            <i class="fas fa-server me-1"></i> REST API
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Visitor Modal -->
+    <div class="modal fade modal-cinema" id="addModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>Ajouter un Visiteur
+                    </h5>
+                    <button type="button" class="btn-close btn-close-cinema" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-visitor-form">
+                        <div class="mb-3">
+                            <label for="visitor-name" class="form-label" style="color: var(--primary-gold);">Nom Complet</label>
+                            <input type="text" class="form-control-cinema" id="visitor-name" required
+                                   placeholder="Entrez le nom complet">
+                            <div class="invalid-feedback" id="name-error">Veuillez entrer un nom valide</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="visitor-age" class="form-label" style="color: var(--primary-gold);">Âge</label>
+                            <input type="number" class="form-control-cinema" id="visitor-age" required
+                                   min="1" max="120" placeholder="Âge du visiteur">
+                            <div class="form-text" style="color: var(--primary-gold);">Catégorie: <span id="age-category">-</span></div>
+                            <div class="invalid-feedback" id="age-error">L'âge doit être entre 1 et 120 ans</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary-cinema" data-bs-dismiss="modal">
+                        Annuler
+                    </button>
+                    <button type="button" class="btn btn-cinema" onclick="addVisitor()">
+                        <i class="fas fa-check me-2"></i>Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Visitor Modal -->
+    <div class="modal fade modal-cinema" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-edit me-2"></i>Modifier le Visiteur
+                    </h5>
+                    <button type="button" class="btn-close btn-close-cinema" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-visitor-form">
+                        <input type="hidden" id="edit-id">
+                        <div class="mb-3">
+                            <label for="edit-name" class="form-label" style="color: var(--primary-gold);">Nom Complet</label>
+                            <input type="text" class="form-control-cinema" id="edit-name" required>
+                            <div class="invalid-feedback" id="edit-name-error">Veuillez entrer un nom valide</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-age" class="form-label" style="color: var(--primary-gold);">Âge</label>
+                            <input type="number" class="form-control-cinema" id="edit-age" required min="1" max="120">
+                            <div class="form-text" style="color: var(--primary-gold);">Catégorie: <span id="edit-age-category">-</span></div>
+                            <div class="invalid-feedback" id="edit-age-error">L'âge doit être entre 1 et 120 ans</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary-cinema" data-bs-dismiss="modal">
+                        Annuler
+                    </button>
+                    <button type="button" class="btn btn-cinema" onclick="updateVisitor()">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="modal fade modal-cinema" id="searchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-search me-2"></i>Recherche Avancée
+                    </h5>
+                    <button type="button" class="btn-close btn-close-cinema" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--primary-gold);">Type de recherche</label>
+                        <select class="form-control-cinema" id="search-type">
+                            <option value="id">Par ID</option>
+                            <option value="name">Par Nom</option>
+                            <option value="age">Par Âge</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control-cinema" id="search-value" 
+                               placeholder="Entrez votre recherche...">
+                    </div>
+                    <div id="search-result" class="mt-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary-cinema" data-bs-dismiss="modal">
+                        Fermer
+                    </button>
+                    <button type="button" class="btn btn-cinema" onclick="performSearch()">
+                        <i class="fas fa-search me-2"></i>Rechercher
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:8081/TestRS/api/users';
+        let visitorsData = [];
+        let ageChart = null;
+        let categoryChart = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            loadVisitors();
+            setupEventListeners();
+        });
+        
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 20}s`;
+                particle.style.opacity = Math.random() * 0.5;
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        function setupEventListeners() {
+            // Age category preview in add modal
+            document.getElementById('visitor-age').addEventListener('input', function() {
+                updateAgeCategory(this.value);
+            });
+            
+            // Age category preview in edit modal
+            document.getElementById('edit-age').addEventListener('input', function() {
+                updateEditAgeCategory(this.value);
+            });
+            
+            // Clear form validation on modal hide
+            const addModal = document.getElementById('addModal');
+            addModal.addEventListener('hidden.bs.modal', function() {
+                resetAddForm();
+            });
+            
+            // Enter key to submit in add modal
+            document.getElementById('visitor-name').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addVisitor();
+                }
+            });
+            
+            document.getElementById('visitor-age').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addVisitor();
+                }
+            });
+        }
+        
+        function updateAgeCategory(age) {
+            const categorySpan = document.getElementById('age-category');
+            if (!age) {
+                categorySpan.textContent = '-';
+                return;
+            }
+            
+            age = parseInt(age);
+            if (age < 18) categorySpan.textContent = 'Jeune';
+            else if (age >= 18 && age <= 60) categorySpan.textContent = 'Adulte';
+            else categorySpan.textContent = 'Sénior';
+        }
+        
+        function updateEditAgeCategory(age) {
+            const categorySpan = document.getElementById('edit-age-category');
+            if (!categorySpan) return;
+            
+            if (!age) {
+                categorySpan.textContent = '-';
+                return;
+            }
+            
+            age = parseInt(age);
+            if (age < 18) categorySpan.textContent = 'Jeune';
+            else if (age >= 18 && age <= 60) categorySpan.textContent = 'Adulte';
+            else categorySpan.textContent = 'Sénior';
+        }
+        
+        // Load all visitors
+        // Charger tous les visiteurs depuis le backend
+async function loadVisitors() {
+    try {
+        showLoading(true); // Affiche le spinner
+        const response = await fetch(`${API_BASE_URL}/affiche`); // ⚡️ Utiliser la variable API_BASE_URL
+        showLoading(false);
+
+        if (!response.ok) throw new Error("Erreur réseau " + response.status);
+
+        const data = await response.json();
+
+        // Vérifie si ton backend renvoie un tableau directement ou un objet {state, data}
+        // ⚡️ Ici on suppose que ton backend renvoie {state: 'ok', data: [...]}
+        if (data.state === 'ok') {
+            visitorsData = data.data; // Stocker pour filtres et stats
+            displayVisitors(visitorsData);
+            updateStatistics(visitorsData);
+            updateCharts(visitorsData);
+        } else {
+            visitorsData = [];
+            displayVisitors(visitorsData);
+            showNotification("Aucun visiteur trouvé", "error");
+        }
+    } catch (error) {
+        showLoading(false);
+        console.error("Erreur:", error);
+        showNotification("Impossible de charger les visiteurs", "error");
+    }
+}
+
+
+        
+        // Display visitors in table
+        function displayVisitors(visitors) {
+            const tbody = document.getElementById('visitors-tbody');
+            const emptyState = document.getElementById('empty-state');
+            const container = document.getElementById('visitors-container');
+            
+            if (!visitors || visitors.length === 0) {
+                emptyState.style.display = 'block';
+                container.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            container.style.display = 'block';
+            
+            tbody.innerHTML = visitors.map(visitor => {
+                const category = getAgeCategory(visitor.age);
+                const categoryClass = {
+                    'Jeune': 'badge-blue',
+                    'Adulte': 'badge-gold',
+                    'Sénior': 'badge-red'
+                }[category];
+                
+                return `
+                    <tr class="visitor-row" data-id="${visitor.id}">
+                        <td>
+                            <span class="badge ${categoryClass}">#${visitor.id}</span>
+                        </td>
+                        <td>
+                            <i class="fas fa-user-circle me-2" style="color: var(--primary-gold);"></i>
+                            <strong>${visitor.name}</strong>
+                        </td>
+                        <td>
+                            <span class="badge badge-gold">${visitor.age} ans</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-cinema" onclick="editVisitor(${visitor.id})">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="confirmDelete(${visitor.id}, '${visitor.name.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('live-counter').textContent = visitors.length;
+        }
+        
+        // Add visitor
+        async function addVisitor() {
+		    const name = document.getElementById('visitor-name').value.trim();
+		    const age = document.getElementById('visitor-age').value;
+		
+		    if (!name || !age) return;
+		
+		    try {
+		        const response = await fetch(
+		            `${API_BASE_URL}/add/${age}/${encodeURIComponent(name)}`,
+		            { method: 'POST' }   // ✅ CORRECTION
+		        );
+		
+		        if (!response.ok) {
+		            throw new Error("Erreur HTTP " + response.status);
+		        }
+		
+		        const data = await response.json();
+		
+		        if (data.state === 'ok') {
+		            showNotification('Visiteur ajouté avec succès', 'success');
+		            bootstrap.Modal.getInstance(
+		                document.getElementById('addModal')
+		            ).hide();
+		            loadVisitors();
+		        } else {
+		            showNotification('Erreur ajout', 'error');
+		        }
+		
+		    } catch (error) {
+		        console.error(error);
+		        showNotification(error.message, 'error');
+		    }
+		}
+
+        function resetAddForm() {
+            document.getElementById('add-visitor-form').reset();
+            document.getElementById('age-category').textContent = '-';
+            document.getElementById('visitor-name').classList.remove('is-invalid');
+            document.getElementById('visitor-age').classList.remove('is-invalid');
+        }
+        
+        // Edit visitor
+        async function editVisitor(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/getid/${id}`);
+                const data = await response.json();
+                
+                if (data.state === 'ok') {
+                    const visitor = data.data;
+                    document.getElementById('edit-id').value = visitor.id;
+                    document.getElementById('edit-name').value = visitor.name;
+                    document.getElementById('edit-age').value = visitor.age;
+                    
+                    // Update age category display
+                    updateEditAgeCategory(visitor.age);
+                    
+                    // Show modal
+                    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                    editModal.show();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Erreur lors de la récupération du visiteur', 'error');
+            }
+        }
+        
+        // Update visitor
+        async function updateVisitor() {
+            const id = document.getElementById('edit-id').value;
+            const name = document.getElementById('edit-name').value.trim();
+            const age = document.getElementById('edit-age').value;
+            
+            // Validation
+            let isValid = true;
+            
+            if (!name || name.length < 2) {
+                document.getElementById('edit-name').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('edit-name').classList.remove('is-invalid');
+            }
+            
+            if (!age || age < 1 || age > 120) {
+                document.getElementById('edit-age').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('edit-age').classList.remove('is-invalid');
+            }
+            
+            if (!isValid) {
+                showNotification('Veuillez corriger les erreurs dans le formulaire', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/update/${id}/${age}/${encodeURIComponent(name)}`, {
+                    method: 'PUT'
+                });
+                
+                const data = await response.json();
+                if (data.state === 'ok') {
+                    showNotification('Visiteur modifié avec succès !', 'success');
+                    
+                    // Fermer le modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                    modal.hide();
+                    
+                    // Recharger la liste
+                    loadVisitors();
+                } else {
+                    throw new Error('Erreur lors de la modification');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Erreur lors de la modification: ' + error.message, 'error');
+            }
+        }
+        
+        // Confirmation de suppression
+        function confirmDelete(id, name) {
+            // Créer un modal de confirmation personnalisé
+            const modalHtml = `
+                <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content" style="
+                            background: linear-gradient(145deg, rgba(26,26,26,0.95), rgba(20,20,20,0.95));
+                            border: 3px solid var(--secondary-red);
+                            border-radius: 20px;
+                            backdrop-filter: blur(20px);
+                        ">
+                            <div class="modal-header" style="
+                                border-bottom: 2px solid rgba(220,53,69,0.4);
+                                background: linear-gradient(135deg, var(--secondary-red), #8B0000);
+                                border-radius: 20px 20px 0 0;
+                            ">
+                                <h5 class="modal-title" style="color: white;">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Confirmation de suppression
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" 
+                                        style="filter: invert(1);"></button>
+                            </div>
+                            <div class="modal-body text-center py-4">
+                                <div class="mb-4">
+                                    <i class="fas fa-trash-alt fa-4x" style="
+                                        background: linear-gradient(135deg, var(--secondary-red), #DC3545);
+                                        -webkit-background-clip: text;
+                                        -webkit-text-fill-color: transparent;
+                                    "></i>
+                                </div>
+                                <h4 style="color: var(--primary-gold);" class="mb-3">
+                                    Supprimer le visiteur ?
+                                </h4>
+                                <p style="color: rgba(255,255,255,0.9);">
+                                    Êtes-vous sûr de vouloir supprimer <strong>"${name}"</strong> ?
+                                </p>
+                                <p class="text-warning">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    Cette action est irréversible !
+                                </p>
+                            </div>
+                            <div class="modal-footer justify-content-center border-top-0">
+                                <button type="button" class="btn btn-secondary-cinema" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>Annuler
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="deleteVisitor(${id}, '${name.replace(/'/g, "\\'")}')" 
+                                        style="
+                                            background: linear-gradient(135deg, #DC3545, var(--secondary-red));
+                                            border: none;
+                                            padding: 10px 25px;
+                                            border-radius: 10px;
+                                            font-weight: 600;
+                                        ">
+                                    <i class="fas fa-trash me-2"></i>Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Ajouter le modal au DOM s'il n'existe pas déjà
+            let modal = document.getElementById('deleteConfirmModal');
+            if (!modal) {
+                const modalContainer = document.createElement('div');
+                modalContainer.innerHTML = modalHtml;
+                document.body.appendChild(modalContainer);
+                modal = document.getElementById('deleteConfirmModal');
+            }
+            
+            // Afficher le modal
+            const deleteModal = new bootstrap.Modal(modal);
+            deleteModal.show();
+        }
+        
+        // Supprimer le visiteur après confirmation
+        async function deleteVisitor(id, name) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/remove/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                if (data.state === 'ok') {
+                    // Fermer le modal de confirmation
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+                    if (modal) modal.hide();
+                    
+                    // Afficher une notification de succès
+                    showNotification(`Visiteur "${name}" supprimé avec succès !`, 'success');
+                    loadVisitors();
+                } else {
+                    throw new Error(data.msg || 'Erreur lors de la suppression');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Erreur lors de la suppression du visiteur', 'error');
+            }
+        }
+        
+        // Update statistics
+        function updateStatistics(visitors) {
+            const total = visitors.length;
+            const young = visitors.filter(v => v.age < 18).length;
+            const adult = visitors.filter(v => v.age >= 18 && v.age <= 60).length;
+            const senior = visitors.filter(v => v.age > 60).length;
+            
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-young').textContent = young;
+            document.getElementById('stat-adult').textContent = adult;
+            document.getElementById('stat-senior').textContent = senior;
+        }
+        
+        // Update charts
+        function updateCharts(visitors) {
+            const categories = ['Jeune', 'Adulte', 'Sénior'];
+            const counts = categories.map(cat => 
+                visitors.filter(v => getAgeCategory(v.age) === cat).length
+            );
+            
+            // Age distribution chart
+            const ageCtx = document.getElementById('ageChart').getContext('2d');
+            if (ageChart) ageChart.destroy();
+            
+            ageChart = new Chart(ageCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: [
+                            'rgba(30, 144, 255, 0.8)',
+                            'rgba(255, 215, 0, 0.8)',
+                            'rgba(178, 34, 34, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(30, 144, 255, 1)',
+                            'rgba(255, 215, 0, 1)',
+                            'rgba(178, 34, 34, 1)'
+                        ],
+                        borderWidth: 3,
+                        hoverOffset: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    size: 14,
+                                    family: "'Montserrat', sans-serif"
+                                },
+                                padding: 25
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Répartition par Catégorie d\'Âge',
+                            color: 'white',
+                            font: {
+                                size: 16,
+                                family: "'Cinzel', serif",
+                                weight: 'bold'
+                            },
+                            padding: 20
+                        }
+                    }
+                }
+            });
+            
+            // Age bar chart
+            const ageGroups = ['0-12', '13-17', '18-25', '26-40', '41-60', '61+'];
+            const ageGroupCounts = ageGroups.map(group => {
+                const [min, max] = group.includes('+') ? 
+                    [61, 120] : 
+                    group.split('-').map(Number);
+                return visitors.filter(v => v.age >= min && v.age <= max).length;
+            });
+            
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            if (categoryChart) categoryChart.destroy();
+            
+            categoryChart = new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ageGroups,
+                    datasets: [{
+                        label: 'Nombre de visiteurs',
+                        data: ageGroupCounts,
+                        backgroundColor: 'rgba(255, 215, 0, 0.7)',
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'white',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'white',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Répartition par Tranche d\'Âge',
+                            color: 'white',
+                            font: {
+                                size: 16,
+                                family: "'Cinzel', serif",
+                                weight: 'bold'
+                            },
+                            padding: 20
+                        }
+                    }
+                }
+            });
+        }
+        
+        function getAgeCategory(age) {
+            if (age < 18) return 'Jeune';
+            if (age >= 18 && age <= 60) return 'Adulte';
+            return 'Sénior';
+        }
+        
+        async function performSearch() {
+            const type = document.getElementById('search-type').value;
+            const value = document.getElementById('search-value').value.trim();
+            const resultDiv = document.getElementById('search-result');
+
+            if (!value) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">Veuillez entrer une valeur</div>';
+                return;
+            }
+
+            try {
+                let url;
+
+                if (type === 'id') {
+                    url = `${API_BASE_URL}/getid/${value}`;
+                } else if (type === 'name') {
+                    url = `${API_BASE_URL}/getname/${encodeURIComponent(value)}`;
+                } else if (type === 'age') {
+                    const filtered = visitorsData.filter(v => v.age == value);
+                    displaySearchResults(filtered, resultDiv);
+                    return;
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.state === 'ok') {
+                    if (type === 'id') {
+                        displaySearchResults([data.data], resultDiv); // ✅ object → list
+                    } else {
+                        displaySearchResults(data.data, resultDiv);  // ✅ list
+                    }
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-warning">${data.state}</div>`;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = '<div class="alert alert-danger">Erreur de recherche</div>';
+            }
+        }
+
+        function displaySearchResult(visitor, container) {
+            const category = getAgeCategory(visitor.age);
+            const categoryClass = {
+                'Jeune': 'badge-blue',
+                'Adulte': 'badge-gold',
+                'Sénior': 'badge-red'
+            }[category];
+            
+            container.innerHTML = `
+                <div class="card" style="background: linear-gradient(145deg, rgba(0,0,0,0.8), rgba(20,20,20,0.9)); border: 2px solid rgba(255,215,0,0.3);">
+                    <div class="card-body">
+                        <h5 class="text-gold">${visitor.name}</h5>
+                        <p class="mb-1">ID: <span class="badge ${categoryClass}">#${visitor.id}</span></p>
+                        <p class="mb-2">Âge: <span class="badge badge-gold">${visitor.age} ans</span></p>
+                        <p>Catégorie: <span class="badge ${categoryClass}">${category}</span></p>
+                        
+                    </div>
+                </div>
+            `;
+        }
+        
+        function displaySearchResults(visitors, container) {
+            if (!visitors || visitors.length === 0) {
+                container.innerHTML = '<div class="alert alert-warning">Aucun résultat</div>';
+                return;
+            }
+            
+            const html = visitors.map(visitor => {
+                const category = getAgeCategory(visitor.age);
+                const categoryClass = {
+                    'Jeune': 'badge-blue',
+                    'Adulte': 'badge-gold',
+                    'Sénior': 'badge-red'
+                }[category];
+                
+                return `
+                    <div class="card mb-2" style="background: linear-gradient(145deg, rgba(0,0,0,0.8), rgba(20,20,20,0.9)); border: 2px solid rgba(255,215,0,0.2);">
+                        <div class="card-body">
+                            <h6 class="text-gold">${visitor.name}</h6>
+                            <p class="mb-1">ID: <span class="badge ${categoryClass}">#${visitor.id}</span></p>
+                            <p class="mb-2">Âge: <span class="badge badge-gold">${visitor.age} ans</span></p>
+                            
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = `
+                <h6 style="color: var(--primary-gold);">Résultats (${visitors.length})</h6>
+                ${html}
+            `;
+        }
+        
+        // Filter visitors by name
+        function filterVisitors() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = visitorsData.filter(v => 
+                v.name.toLowerCase().includes(searchTerm) ||
+                v.age.toString().includes(searchTerm) ||
+                v.id.toString().includes(searchTerm)
+            );
+            displayVisitors(filtered);
+        }
+        
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            displayVisitors(visitorsData);
+        }
+        
+        function exportData() {
+            const dataStr = JSON.stringify(visitorsData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'visiteurs_cinema.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Données exportées avec succès !', 'success');
+        }
+        
+        // Fonction pour afficher des notifications
+        function showNotification(message, type = 'info') {
+            // Créer la notification
+            const notification = document.createElement('div');
+            notification.className = 'notification-cinema';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideIn 0.3s ease-out;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+                border: 2px solid;
+                max-width: 300px;
+            `;
+            
+            if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, rgba(25, 135, 84, 0.9), rgba(21, 87, 36, 0.9))';
+                notification.style.borderColor = 'rgba(25, 135, 84, 0.5)';
+                notification.innerHTML = `<i class="fas fa-check-circle me-2"></i> ${message}`;
+            } else if (type === 'error') {
+                notification.style.background = 'linear-gradient(135deg, rgba(220, 53, 69, 0.9), rgba(178, 34, 34, 0.9))';
+                notification.style.borderColor = 'rgba(220, 53, 69, 0.5)';
+                notification.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i> ${message}`;
+            } else {
+                notification.style.background = 'linear-gradient(135deg, rgba(13, 110, 253, 0.9), rgba(30, 144, 255, 0.9))';
+                notification.style.borderColor = 'rgba(13, 110, 253, 0.5)';
+                notification.innerHTML = `<i class="fas fa-info-circle me-2"></i> ${message}`;
+            }
+            
+            // Ajouter la notification au DOM
+            document.body.appendChild(notification);
+            
+            // Supprimer automatiquement après 3 secondes
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        function showLoading(show) {
+            const spinner = document.getElementById('loading-spinner');
+            spinner.style.display = show ? 'block' : 'none';
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadVisitors, 30000);
+    </script>
+</body>
+</html>

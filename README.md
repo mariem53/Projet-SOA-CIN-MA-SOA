@@ -202,7 +202,7 @@ Deux méthodes sont possibles :
 Lien drive :
 
 ```
-https://youtu.be/XXXXXXXX a changeeee***
+https://drive.google.com/drive/folders/1BglEFoXB_1bHTR1u_k2ECScx7Ejd4UOA?usp=sharing
 ```
 
 ---
@@ -218,7 +218,7 @@ https://github.com/mariem53/Projet-SOA-CIN-MA-SOA.git
 ---
 
 ## Auteurs
-* **Mariem Baccouch** (Groupe TP 6)
+* **Mariem Baccouche** (Groupe TP 6)
 * **Yosra Regaieg** (Groupe TP 7)
 * **Module** : SOA
 * **Année universitaire** : 2025 / 2026

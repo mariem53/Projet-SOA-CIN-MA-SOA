@@ -49,7 +49,7 @@ Ce projet a été réalisé dans le cadre du **cours de développement JEE**, af
 
 
 ---
-![image](img/structure.jpeg)
+![image](img/stuct.jpg)
 ---
 ### Interface utilisateur
 

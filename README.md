@@ -7,7 +7,7 @@ Le projet repose sur une architecture **Client / Serveur REST** où :
 
 - Le **frontend** fournit une interface utilisateur moderne, interactive et responsive.
 - Le **backend** expose des services RESTful développés en **JEE / JAX-RS**, avec **JPA / Hibernate** pour la persistance des données.
-
+![image](img/image.jpg)
 Ce projet a été réalisé dans le cadre du **cours de développement JEE**, afin de démontrer l’intégration complète d’une architecture REST avec une interface web dynamique.
 
 ---
@@ -202,7 +202,7 @@ Deux méthodes sont possibles :
 Lien drive :
 
 ```
-https://youtu.be/XXXXXXXX a changeeee***
+https://drive.google.com/drive/folders/1BglEFoXB_1bHTR1u_k2ECScx7Ejd4UOA?usp=sharing
 ```
 
 ---
@@ -218,7 +218,7 @@ https://github.com/mariem53/Projet-SOA-CIN-MA-SOA.git
 ---
 
 ## Auteurs
-* **Mariem Baccouch** (Groupe TP 6)
+* **Mariem Baccouche** (Groupe TP 6)
 * **Yosra Regaieg** (Groupe TP 7)
 * **Module** : SOA
 * **Année universitaire** : 2025 / 2026
